@@ -9,7 +9,6 @@ inline __m256 avx2_sin_ps(__m256 x) {
     __m256 sign_mask = _mm256_set1_ps(-0.0f);
     __m256 sin_mask = _mm256_set1_ps(1.27323954f);
     __m256 cos_mask = _mm256_set1_ps(0.405284735f);
-    __m256 zero = _mm256_setzero_ps();
     __m256 one = _mm256_set1_ps(1.0f);
 
     __m256 abs_x = _mm256_andnot_ps(sign_mask, x);
@@ -19,11 +18,13 @@ inline __m256 avx2_sin_ps(__m256 x) {
     __m256 sign = _mm256_and_ps(x, sign_mask);
     __m256 c = _mm256_andnot_ps(sign_mask, y);
 
-    __m256 res = _mm256_fmadd_ps(sin_mask, c, _mm256_mul_ps(cos_mask, _mm256_mul_ps(c, _mm256_sub_ps(one, c))));
+    __m256 c_mul = _mm256_mul_ps(c, _mm256_sub_ps(one, c));
+    __m256 res = _mm256_add_ps(_mm256_mul_ps(sin_mask, c), _mm256_mul_ps(cos_mask, c_mul));
     res = _mm256_xor_ps(res, sign);
 
     return res;
 }
+
 
 // AVX2 function
 void avx2_complex_op(float* a, float* b, float* result, int size) {
