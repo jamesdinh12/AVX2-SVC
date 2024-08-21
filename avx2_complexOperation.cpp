@@ -4,6 +4,27 @@
 #include <cmath>
 #include <random>
 
+// AVX2 approximate sine function
+inline __m256 avx2_sin_ps(__m256 x) {
+    __m256 sign_mask = _mm256_set1_ps(-0.0f);
+    __m256 sin_mask = _mm256_set1_ps(1.27323954f);
+    __m256 cos_mask = _mm256_set1_ps(0.405284735f);
+    __m256 zero = _mm256_setzero_ps();
+    __m256 one = _mm256_set1_ps(1.0f);
+
+    __m256 abs_x = _mm256_andnot_ps(sign_mask, x);
+    __m256 y = _mm256_mul_ps(x, _mm256_set1_ps(0.15915494309189535f)); // x * (1/2pi)
+    y = _mm256_sub_ps(y, _mm256_round_ps(y, _MM_FROUND_TO_NEAREST_INT));
+
+    __m256 sign = _mm256_and_ps(x, sign_mask);
+    __m256 c = _mm256_andnot_ps(sign_mask, y);
+
+    __m256 res = _mm256_fmadd_ps(sin_mask, c, _mm256_mul_ps(cos_mask, _mm256_mul_ps(c, _mm256_sub_ps(one, c))));
+    res = _mm256_xor_ps(res, sign);
+
+    return res;
+}
+
 // AVX2 function
 void avx2_complex_op(float* a, float* b, float* result, int size) {
     const __m256 scale = _mm256_set1_ps(0.1f);
@@ -20,7 +41,7 @@ void avx2_complex_op(float* a, float* b, float* result, int size) {
         dot = _mm256_mul_ps(dot, scale);
         
         // Apply sine function
-        __m256 sin_result = _mm256_sin_ps(dot);
+        __m256 sin_result = avx2_sin_ps(dot);
         
         _mm256_storeu_ps(&result[i], sin_result);
     }
