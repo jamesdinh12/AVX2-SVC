@@ -21,7 +21,7 @@ void regular_operation(std::vector<float>& a, std::vector<float>& b, std::vector
 }
 
 void sve_operation(std::vector<float>& a, std::vector<float>& b, std::vector<float>& result) {
-    svfloat32_t vdot = svdupq_n_f32(0.0f);
+    svfloat32_t vdot = svdup_n_f32(0.0f);
     
     for (int i = 0; i < ARRAY_SIZE; i += svcntw()) {
         svbool_t pg = svwhilelt_b32(i, ARRAY_SIZE);
@@ -39,8 +39,13 @@ void sve_operation(std::vector<float>& a, std::vector<float>& b, std::vector<flo
         svbool_t pg = svwhilelt_b32(i, ARRAY_SIZE);
         svfloat32_t va = svld1(pg, &a[i]);
         svfloat32_t vresult = svmul_f32_z(pg, vscaled, va);
-        vresult = svsin_f32_z(pg, vresult);
+        // Replace SVE sine with scalar sine
         svst1(pg, &result[i], vresult);
+    }
+
+    // Apply sine function separately
+    for (int i = 0; i < ARRAY_SIZE; ++i) {
+        result[i] = std::sin(result[i]);
     }
 }
 
