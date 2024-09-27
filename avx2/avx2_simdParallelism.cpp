@@ -27,7 +27,7 @@ int main() {
     vec_c = _mm512_mask_add_pd(vec_c, mask, vec_a, vec_b);  // Masked addition
 
     // Fused Multiply-Add (FMA)
-    vec_d = _mm512_mask3_fmadd_pd(vec_d, mask, vec_a, vec_b, vec_d);  // Masked FMA: vec_d = (vec_a * vec_b) + vec_d
+   vec_d = _mm512_mask3_fmadd_pd(vec_a, vec_b, vec_d, mask);  // Masked FMA: vec_d = (vec_a * vec_b) + vec_d
 
     // Store results back to arrays
     _mm512_storeu_pd(c, vec_c);
