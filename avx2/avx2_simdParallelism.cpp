@@ -79,7 +79,7 @@ int main() {
 
     // AAD computations
     __m512d vadd = _mm512_mask_add_pd(va, mask, va, vb);
-    __m512d vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask, _mm512_set1_pd(0.5));
+    __m512d vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask);
 
     // Fast Exp computations
     __m512d vmax = _mm512_max_pd(va, vb);
@@ -128,7 +128,7 @@ int main() {
     // Perform computations (you can add more operations here)
     for (int i = 0; i < 1000; i++) {
         vadd = _mm512_mask_add_pd(va, mask, va, vb);
-        vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask, _mm512_set1_pd(0.5));
+        vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask);
         vmax = _mm512_max_pd(va, vb);
         vmin = _mm512_min_pd(va, vb);
         vmul = _mm512_mul_pd(va, vb);
