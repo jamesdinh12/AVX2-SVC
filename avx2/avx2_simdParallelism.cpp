@@ -16,6 +16,16 @@ void print_vector(__m512d v) {
     std::cout << "]\n";
 }
 
+// Helper function to print a 256-bit integer vector
+void print_vector(__m256i v) {
+    int32_t* ptr = reinterpret_cast<int32_t*>(&v);
+    std::cout << "[";
+    for (int i = 0; i < 8; i++) {
+        std::cout << ptr[i] << ", ";
+    }
+    std::cout << "]\n";
+}
+
 // Helper function to print a 512-bit integer vector
 void print_vector(__m512i v) {
     int64_t* ptr = reinterpret_cast<int64_t*>(&v);
@@ -69,14 +79,14 @@ int main() {
 
     // AAD computations
     __m512d vadd = _mm512_mask_add_pd(va, mask, va, vb);
-    __m512d vfma = _mm512_mask3_fmadd_pd(va, vb, vc, _mm512_set1_pd(0.5), mask);
+    __m512d vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask, _mm512_set1_pd(0.5));
 
     // Fast Exp computations
     __m512d vmax = _mm512_max_pd(va, vb);
     __m512d vmin = _mm512_min_pd(va, vb);
     __m512d vmul = _mm512_mul_pd(va, vb);
     __m512d vcvt = _mm512_cvt_roundps_pd(ve, _MM_FROUND_NO_EXC);
-    __m512i vcvti = _mm512_cvt_roundpd_epi32(vc, _MM_FROUND_NO_EXC);
+    __m256i vcvti = _mm512_cvt_roundpd_epi32(vc, _MM_FROUND_NO_EXC);
     __m512d vfmadd = _mm512_fmadd_pd(va, vb, vc);
     __m512d vsub = _mm512_sub_pd(va, vb);
     __m512d vcast = _mm512_castsi512_pd(_mm512_castpd_si512(vc));
@@ -118,7 +128,7 @@ int main() {
     // Perform computations (you can add more operations here)
     for (int i = 0; i < 1000; i++) {
         vadd = _mm512_mask_add_pd(va, mask, va, vb);
-        vfma = _mm512_mask3_fmadd_pd(va, vb, vc, _mm512_set1_pd(0.5), mask);
+        vfma = _mm512_mask3_fmadd_pd(va, vb, vc, mask, _mm512_set1_pd(0.5));
         vmax = _mm512_max_pd(va, vb);
         vmin = _mm512_min_pd(va, vb);
         vmul = _mm512_mul_pd(va, vb);
