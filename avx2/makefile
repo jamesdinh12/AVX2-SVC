@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -mavx512 -O3 -std=c++11
+CXXFLAGS = -mavx512f -O3 -std=c++11
 
 all: avx2_simpleAddition avx2_complexOperation avx2_simdParallelism
 
